@@ -1,0 +1,953 @@
+{
+  "name": "Creacion estructura envio de AlertB1",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n\"ClientID\": \"bd4374ee-bba8-4780-8f19-39a15a2fd7ad\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1344,
+        1072
+      ],
+      "id": "e4630a67-710e-442f-80d7-f24111e23df2",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tables",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        352
+      ],
+      "id": "64d7f879-284f-4888-9e87-61ea26422945",
+      "name": "Split Out",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.URLBase }}/b1s/v2/UserTablesMD",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('Edit Fields').item.json.Token }};ROUTEID=.node4;"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        448
+      ],
+      "id": "d12ad447-6f9b-4275-a96d-34a79c187027",
+      "name": "HTTP Request2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cdc8ffeb-63c6-404c-aa94-85ece9c1b33e",
+              "name": "Token",
+              "value": "={{ $json.SESSIONID }}",
+              "type": "string"
+            },
+            {
+              "id": "542b3c41-0347-4f2b-b52a-5d9285739baa",
+              "name": "URLBase",
+              "value": "={{ $json.URLSL }}",
+              "type": "string"
+            },
+            {
+              "id": "3e09167f-182b-4fc1-939d-6e7ef8ac3b33",
+              "name": "DataBaseType",
+              "value": "={{ $json.DataBase }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        1072
+      ],
+      "id": "bbd54fdc-851d-4c9c-829b-ada494a02b03",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.URLBase }}/b1s/v2/UserFieldsMD",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('Edit Fields').item.json.Token }};ROUTEID=.node4;"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        832
+      ],
+      "id": "6e877a73-d020-4ef9-9707-3d494056d4bd",
+      "name": "HTTP Request3",
+      "alwaysOutputData": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      fields: [\n        {\n          \"Name\": \"SOL_ViewNameLayout\",\n          \"Description\": \"Nombre de la vista [Layout]\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 254,\n          \"TableName\": \"@SOL_ObjectMD\"\n        },\n        {\n          \"Name\": \"SOL_SubjectHTML\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 254,\n          \"Description\": \"Asunto mail\",\n          \"TableName\": \"@SOL_ObjectMD\"\n        },\n        {\n          \"Name\": \"SOL_BodyHTML\",\n          \"Type\": \"db_Memo\",\n          \"Description\": \"HTML cuerpo mail\",\n          \"TableName\": \"@SOL_ObjectMD\"\n        },\n        {\n          \"Name\": \"SOL_CardCode\",\n          \"Type\": \"db_Alpha\",\n          \"SubType\": \"st_Link\",\n          \"TableName\": \"@SOL_ALERTSB1_H\",\n          \"Description\": \"Codigo SN\",\n          \"LinkedSystemObject\": \"ulBusinessPartners\"\n        },\n        {\n          \"Name\": \"SOL_CardName\",\n          \"Description\": \"Nombre SN\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 254,\n          \"TableName\": \"@SOL_ALERTSB1_H\"\n        },\n        {\n          \"Name\": \"SOL_ObjectType\",\n          \"Description\": \"Tipo de objeto\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 100,\n          \"SubType\": \"st_None\",\n          \"LinkedTable\": \"SOL_OBJECTMD\",\n          \"DefaultValue\": null,\n          \"TableName\": \"@SOL_ALERTSB1_L\"\n        },\n        {\n          \"Name\": \"SOL_Active\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 1,\n          \"Description\": \"Activo (Y/N)\",\n          \"TableName\": \"@SOL_ALERTSB1_L\",\n          \"ValidValuesMD\": [\n            { \"Value\": \"Y\",\t\"Description\": \"Y\"},\n            { \"Value\": \"N\", \"Description\": \"N\"}\n      \t]\n        },\n        {\n          \"Name\": \"SOL_Mail\",\n          \"Type\": \"db_Memo\",\n          \"Description\": \"Correos [Separar por punto y coma(;)]\",\n          \"TableName\": \"@SOL_ALERTSB1_L\"\n        },\n        {\n          \"Name\": \"SOL_Send\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 1,\n          \"Description\": \"Enviar (Y/N)\",\n          \"TableName\": \"OVPM\",\n          \"DefaultValue\": \"Y\",\n          \"ValidValuesMD\": [\n            { \"Value\": \"Y\",\t\"Description\": \"Y\"},\n            { \"Value\": \"N\", \"Description\": \"N\"}\n      \t]\n        },\n        {\n          \"Name\": \"SOL_Send\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 1,\n          \"Description\": \"Enviar (Y/N)\",\n          \"TableName\": \"ORCT\",\n          \"DefaultValue\": \"Y\",\n          \"ValidValuesMD\": [\n            { \"Value\": \"Y\",\t\"Description\": \"Y\"},\n            { \"Value\": \"N\", \"Description\": \"N\"}\n      \t]\n        },\n        {\n          \"Name\": \"SOL_Send\",\n          \"Type\": \"db_Alpha\",\n          \"Size\": 1,\n          \"Description\": \"Enviar (Y/N)\",\n          \"TableName\": \"OPOR\",\n          \"DefaultValue\": \"Y\",\n          \"ValidValuesMD\": [\n            { \"Value\": \"Y\",\t\"Description\": \"Y\"},\n            { \"Value\": \"N\", \"Description\": \"N\"}\n      \t]\n        },\n        {\n          \"Name\": \"SOL_LogoPath\",\n          \"Description\": \"APB1 Logo\",\n          \"Type\": \"db_Memo\",\n          \"SubType\": \"st_Link\",\n          \"TableName\": \"OADM\"\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        736
+      ],
+      "id": "e637471a-37b3-4f99-89b9-470290104167",
+      "name": "Code6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      value: [\n        {\n          \"Code\": \"22\",\n          \"Name\": \"Orden de compra\",\n          \"U_SOL_ViewNameLayout\": \"SOL_ALERTB1_LAYOUT_OC\",\n          \"U_SOL_SubjectHTML\": \"%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%\",\n          \"U_SOL_BodyHTML\": `<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>`\n        },\n        { \"Code\": \"24\", \n          \"Name\": \"Pago recibido\",\n           \"U_SOL_ViewNameLayout\": \"\",\n          \"U_SOL_SubjectHTML\": \"%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%\",\n          \"U_SOL_BodyHTML\": `<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>`\n        },\n        { \"Code\": \"46\",\n          \"Name\": \"Pago efectuado\",\n           \"U_SOL_ViewNameLayout\": \"SOL_ALERTB1_LAYOUT_PAGO_EFECTUADO\",\n          \"U_SOL_SubjectHTML\": \"%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%\",\n          \"U_SOL_BodyHTML\": `<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>`\n        }\n      ]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        976
+      ],
+      "id": "264ca9d0-b159-450f-8d1d-6e105d53f847",
+      "name": "Code",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "value",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        1120
+      ],
+      "id": "60e60983-c618-4081-9fe8-2841ef9eb359",
+      "name": "Split Out2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.URLBase }}/b1s/v2/U_SOL_OBJECTMD",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('Edit Fields').item.json.Token }};ROUTEID=.node4;"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        1120
+      ],
+      "id": "1472b03d-5e82-49e2-9d53-f2d5b4b26364",
+      "name": "HTTP Request4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        352
+      ],
+      "id": "54f21479-66d1-42ab-90f4-e0b4618ebfdf",
+      "name": "Loop Over Items1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        0,
+        256
+      ],
+      "id": "1e13c4c4-b378-43b2-bd57-bd4e87c4b40d",
+      "name": "Aggregate1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        224,
+        256
+      ],
+      "id": "c386df4c-198d-4872-9177-a342104fbdca",
+      "name": "Split Out6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        736
+      ],
+      "id": "73087d60-8501-46c2-808d-ee0aed85e23a",
+      "name": "Split Out1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook-solsetec.tangara.cloud/webhook/CredentialsSL",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "gK5R130CRu7EeTxWxZpLufx1s81AtgcrKCo7rIk4t1S3pc4T02AgJR9JZS0Pfekm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "clientid",
+              "value": "={{ $json.ClientID }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1120,
+        1072
+      ],
+      "id": "8525e837-06a5-4c76-9c09-08ea3969bf31",
+      "name": "RefresSessionID"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        736
+      ],
+      "id": "efae41ea-18ab-4130-8276-a536b806ac7b",
+      "name": "Loop Over Items",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        0,
+        640
+      ],
+      "id": "b2a15509-a9d5-4fb0-9bca-daabe1c573c1",
+      "name": "Aggregate",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        224,
+        640
+      ],
+      "id": "a82ff119-55f5-4cc8-901b-a90d2e371adb",
+      "name": "Split Out7",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      tables: [\n        {\n          \"TableName\": \"SOL_OBJECTMD\",\n          \"TableDescription\": \"Maestro de objetos para envio\",\n          \"TableType\": \"bott_NoObject\",\n          \"Archivable\": \"tNO\",\n          \"ArchiveDateField\": null,\n          \"DisplayMenu\": \"tYES\"\n        },\n        {\n          \"TableName\": \"SOL_ALERTSB1_H\",\n          \"TableDescription\": \"Envio alertas head\",\n          \"TableType\": \"bott_MasterData\",\n          \"Archivable\": \"tNO\",\n          \"ArchiveDateField\": null,\n          \"DisplayMenu\": \"tYES\"\n        },\n        {\n          \"TableName\": \"SOL_ALERTSB1_L\",\n          \"TableDescription\": \"Envio alertas lineas\",\n          \"TableType\": \"bott_MasterDataLines\",\n          \"Archivable\": \"tNO\",\n          \"ArchiveDateField\": null,\n          \"DisplayMenu\": \"tYES\"\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1344,
+        32
+      ],
+      "id": "dbc1fbd5-b968-4f5d-9c10-ca249f11307f",
+      "name": "Nodo de tablas version DisplayMenu",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.URLBase }}/b1s/v2/UserObjectsMD",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('Edit Fields').item.json.Token }};ROUTEID=.node4;"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"TableName\": \"SOL_ALERTSB1_H\",\n  \"Code\": \"SOL_ALERTB1\",\n  \"CanCreateDefaultForm\": \"tYES\",\n  \"ObjectType\": \"boud_MasterData\",\n  \"CanCancel\": \"tNO\",\n  \"CanDelete\": \"tYES\",\n  \"CanLog\": \"tYES\",\n  \"ManageSeries\": \"tNO\",\n  \"CanFind\": \"tYES\",\n  \"CanYearTransfer\": \"tNO\",\n  \"Name\": \"SOLSETEC :: Alertas\",\n  \"CanClose\": \"tNO\",\n  \"OverwriteDllfile\": \"tYES\",\n  \"UseUniqueFormType\": \"tYES\",\n  \"CanArchive\": \"tNO\",\n  \"MenuItem\": \"tNO\",\n  \"MenuCaption\": \"\",\n  \"FatherMenuID\": null,\n  \"Position\": null,\n  \"MenuUID\": null,\n  \"EnableEnhancedForm\": \"tNO\",\n  \"RebuildEnhancedForm\": \"tNO\",\n  \"ApplyAuthorization\": \"tYES\",\n  \"UserObjectMD_ChildTables\": [\n    {\n      \"SonNumber\": 1,\n      \"TableName\": \"SOL_ALERTSB1_L\",\n      \"LogTableName\": \"ASOL_ALERTSB1_L\",\n      \"Code\": \"SOL_ALERTB1\",\n      \"ObjectName\": \"SOL_ALERTSB1_L\"\n    }\n  ],\n  \"UserObjectMD_FindColumns\": [\n    {\n      \"ColumnNumber\": 1,\n      \"ColumnAlias\": \"Code\",\n      \"ColumnDescription\": \"Code\",\n      \"Code\": \"SOL_ALERTB1\"\n    },\n    {\n      \"ColumnNumber\": 2,\n      \"ColumnAlias\": \"U_SOL_CardCode\",\n      \"ColumnDescription\": \"Codigo SN\",\n      \"Code\": \"SOL_ALERTB1\"\n    },\n    {\n      \"ColumnNumber\": 3,\n      \"ColumnAlias\": \"U_SOL_CardName\",\n      \"ColumnDescription\": \"Nombre SN\",\n      \"Code\": \"SOL_ALERTB1\"\n    }\n  ],\n  \"UserObjectMD_FormColumns\": [\n    {\n      \"FormColumnAlias\": \"U_SOL_ObjectType\",\n      \"FormColumnDescription\": \"Tipo de objeto\",\n      \"FormColumnNumber\": 1,\n      \"SonNumber\": 1,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tNO\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_Active\",\n      \"FormColumnDescription\": \"Activo (Y/N)\",\n      \"FormColumnNumber\": 2,\n      \"SonNumber\": 1,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tNO\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_Mail\",\n      \"FormColumnDescription\": \"Correos [Separar por punto y coma(;)]\",\n      \"FormColumnNumber\": 3,\n      \"SonNumber\": 1,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tNO\"\n    },\n    {\n      \"FormColumnAlias\": \"Code\",\n      \"FormColumnDescription\": \"Code\",\n      \"FormColumnNumber\": 4,\n      \"SonNumber\": 0,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tYES\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_CardCode\",\n      \"FormColumnDescription\": \"Codigo SN\",\n      \"FormColumnNumber\": 5,\n      \"SonNumber\": 0,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tYES\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_CardName\",\n      \"FormColumnDescription\": \"Nombre SN\",\n      \"FormColumnNumber\": 6,\n      \"SonNumber\": 0,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tYES\"\n    }\n  ],\n  \"UserObjectMD_EnhancedFormColumns\": []\n}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        928
+      ],
+      "id": "fad3022c-df9b-4be7-8927-6bbf0775c63d",
+      "name": "Creacion UDO con \"ApplyAuthorization\"",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.URLBase }}/b1s/v2/UserObjectsMD",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('Edit Fields').item.json.Token }};ROUTEID=.node4;"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"TableName\": \"SOL_ALERTSB1_H\",\n  \"Code\": \"SOL_ALERTB1\",\n  \"CanCreateDefaultForm\": \"tYES\",\n  \"ObjectType\": \"boud_MasterData\",\n  \"CanCancel\": \"tNO\",\n  \"CanDelete\": \"tYES\",\n  \"CanLog\": \"tYES\",\n  \"ManageSeries\": \"tNO\",\n  \"CanFind\": \"tYES\",\n  \"CanYearTransfer\": \"tNO\",\n  \"Name\": \"SOLSETEC :: Alertas\",\n  \"CanClose\": \"tNO\",\n  \"OverwriteDllfile\": \"tYES\",\n  \"UseUniqueFormType\": \"tYES\",\n  \"CanArchive\": \"tNO\",\n  \"MenuItem\": \"tNO\",\n  \"MenuCaption\": \"\",\n  \"FatherMenuID\": null,\n  \"Position\": null,\n  \"MenuUID\": null,\n  \"EnableEnhancedForm\": \"tNO\",\n  \"RebuildEnhancedForm\": \"tNO\",\n  \"UserObjectMD_ChildTables\": [\n    {\n      \"SonNumber\": 1,\n      \"TableName\": \"SOL_ALERTSB1_L\",\n      \"LogTableName\": \"ASOL_ALERTSB1_L\",\n      \"Code\": \"SOL_ALERTB1\",\n      \"ObjectName\": \"SOL_ALERTSB1_L\"\n    }\n  ],\n  \"UserObjectMD_FindColumns\": [\n    {\n      \"ColumnNumber\": 1,\n      \"ColumnAlias\": \"Code\",\n      \"ColumnDescription\": \"Code\",\n      \"Code\": \"SOL_ALERTB1\"\n    },\n    {\n      \"ColumnNumber\": 2,\n      \"ColumnAlias\": \"U_SOL_CardCode\",\n      \"ColumnDescription\": \"Codigo SN\",\n      \"Code\": \"SOL_ALERTB1\"\n    },\n    {\n      \"ColumnNumber\": 3,\n      \"ColumnAlias\": \"U_SOL_CardName\",\n      \"ColumnDescription\": \"Nombre SN\",\n      \"Code\": \"SOL_ALERTB1\"\n    }\n  ],\n  \"UserObjectMD_FormColumns\": [\n    {\n      \"FormColumnAlias\": \"U_SOL_ObjectType\",\n      \"FormColumnDescription\": \"Tipo de objeto\",\n      \"FormColumnNumber\": 1,\n      \"SonNumber\": 1,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tNO\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_Active\",\n      \"FormColumnDescription\": \"Activo (Y/N)\",\n      \"FormColumnNumber\": 2,\n      \"SonNumber\": 1,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tNO\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_Mail\",\n      \"FormColumnDescription\": \"Correos [Separar por punto y coma(;)]\",\n      \"FormColumnNumber\": 3,\n      \"SonNumber\": 1,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tNO\"\n    },\n    {\n      \"FormColumnAlias\": \"Code\",\n      \"FormColumnDescription\": \"Code\",\n      \"FormColumnNumber\": 4,\n      \"SonNumber\": 0,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tYES\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_CardCode\",\n      \"FormColumnDescription\": \"Codigo SN\",\n      \"FormColumnNumber\": 5,\n      \"SonNumber\": 0,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tYES\"\n    },\n    {\n      \"FormColumnAlias\": \"U_SOL_CardName\",\n      \"FormColumnDescription\": \"Nombre SN\",\n      \"FormColumnNumber\": 6,\n      \"SonNumber\": 0,\n      \"Code\": \"SOL_ALERTB1\",\n      \"Editable\": \"tYES\"\n    }\n  ],\n  \"UserObjectMD_EnhancedFormColumns\": []\n}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -672,
+        1312
+      ],
+      "id": "86750554-f75c-41fb-847a-6c793eaf139f",
+      "name": "Creacion de UDO sin \"ApplyAuthorization\"",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      tables: [\n        {\n          \"TableName\": \"SOL_OBJECTMD\",\n          \"TableDescription\": \"Maestro de objetos para envio\",\n          \"TableType\": \"bott_NoObject\",\n          \"Archivable\": \"tNO\",\n          \"ArchiveDateField\": null\n        },\n        {\n          \"TableName\": \"SOL_ALERTSB1_H\",\n          \"TableDescription\": \"Envio alertas head\",\n          \"TableType\": \"bott_MasterData\",\n          \"Archivable\": \"tNO\",\n          \"ArchiveDateField\": null\n        },\n        {\n          \"TableName\": \"SOL_ALERTSB1_L\",\n          \"TableDescription\": \"Envio alertas lineas\",\n          \"TableType\": \"bott_MasterDataLines\",\n          \"Archivable\": \"tNO\",\n          \"ArchiveDateField\": null\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        352
+      ],
+      "id": "fb8e5bec-b360-428f-bfbc-93362de72257",
+      "name": "Nodo de tablas version  sin DisplayMenu",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      Views: [\n        {\n          \"Name\": \"SOL_ALERTB1_COREB1SLQuery\"\n        },\n        {\n          \"Name\": \"SOL_ALERTB1_LAYOUT_OCB1SLQuery\"\n        },\n        {\n          \"Name\": \"SOL_ALERTB1_LAYOUT_PAGO_EFECTUADOB1SLQuery\"\n        }\n      ]\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        1504
+      ],
+      "id": "faf994f8-0849-46b1-8742-70cce0bc303d",
+      "name": "Vistas SQL - ServiceLayer",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Views",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        1504
+      ],
+      "id": "72e3622e-7cc3-4fa2-8ab0-ffdc9ef908b8",
+      "name": "Split Out3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.URLBase }}/b1s/v2/SQLViews('{{ $json.Name }}')/Expose",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('Edit Fields').item.json.Token }};"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "0b1c1904-a12e-4ffb-b006-5002018b1b5f",
+      "name": "Exponer Vista1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        1504
+      ],
+      "notesInFlow": true,
+      "disabled": true,
+      "onError": "continueRegularOutput",
+      "notes": "Conectar al Service Layer de SAP B1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        1504
+      ],
+      "id": "d60b4646-9168-4b8f-a09b-ed7818c5f4a9",
+      "name": "Loop Over Items2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.DataBaseType }}",
+                    "rightValue": "HANA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "52c6af2b-1a1c-42ec-9dd6-5fe87af55e1c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "22f7ffb2-9a50-4782-a0c4-e97fe1630b5d",
+                    "leftValue": "={{ $json.DataBaseType }}",
+                    "rightValue": "SQL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -672,
+        1120
+      ],
+      "id": "0e85a12b-b348-47fd-a3d2-97cffa615577",
+      "name": "Switch",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      value: [\n        {\n          \"Code\": \"22\",\n          \"Name\": \"Orden de compra\",\n          \"U_SOL_ViewNameLayout\": \"SOL_ALERTB1_LAYOUT_OCB1SLQuery\",\n          \"U_SOL_SubjectHTML\": \"%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%\",\n          \"U_SOL_BodyHTML\": `<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>`\n        },\n        { \"Code\": \"24\", \n          \"Name\": \"Pago recibido\",\n           \"U_SOL_ViewNameLayout\": \"\",\n          \"U_SOL_SubjectHTML\": \"%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%\",\n          \"U_SOL_BodyHTML\": `<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>`\n        },\n        { \"Code\": \"46\",\n          \"Name\": \"Pago efectuado\",\n           \"U_SOL_ViewNameLayout\": \"SOL_ALERTB1_LAYOUT_PAGO_EFECTUADOB1SLQuery\",\n          \"U_SOL_SubjectHTML\": \"%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%\",\n          \"U_SOL_BodyHTML\": `<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>`\n        }\n      ]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        1168
+      ],
+      "id": "066edc36-faf7-47ee-95de-5796da862743",
+      "name": "Code1",
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "ClientID": "85037f6f-f708-4f3a-9bdc-3cba6e2591fd"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "RefresSessionID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Creacion UDO con \"ApplyAuthorization\"",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Nodo de tablas version  sin DisplayMenu",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Creacion de UDO sin \"ApplyAuthorization\"",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vistas SQL - ServiceLayer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Split Out6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RefresSessionID": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Split Out7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nodo de tablas version DisplayMenu": {
+      "main": [
+        []
+      ]
+    },
+    "Nodo de tablas version  sin DisplayMenu": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vistas SQL - ServiceLayer": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Exponer Vista1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exponer Vista1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a655ff87-9967-41ac-8957-7ed3c8aa77ce",
+  "meta": {
+    "instanceId": "ec5cc2dd2dc93425bac8ac5a30885c9489657a9f4942de978efcd655a49efe88"
+  },
+  "nodeGroups": [],
+  "id": "VZAGUgsugANlkeCr",
+  "tags": []
+}

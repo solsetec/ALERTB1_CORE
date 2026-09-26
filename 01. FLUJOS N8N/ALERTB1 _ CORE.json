@@ -1,0 +1,912 @@
+{
+  "name": "ALERTB1 | CORE",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "value",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -352
+      ],
+      "id": "6fef6d1b-331a-4732-b34e-bee2f0fe9c8d",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.TipoDoc }}",
+                    "rightValue": "Orden de compra",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0e900ef5-1b89-4e3f-85c3-ed629a0f77f6"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d9a95c24-e157-4908-9ff9-56b723b41acf",
+                    "leftValue": "={{ $json.TipoDoc }}",
+                    "rightValue": "Pago efectuado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        -352
+      ],
+      "id": "73a51427-f3f0-4dcf-aabf-212681316ad5",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Orden de Compra {{ $json.DocNum }}</title>\n  <style>\n    @page { size: letter; margin: 1cm; }\n\n    :root {\n      --azul-oscuro: #1b2a4a;\n      --azul-medio: #2c4a75;\n      --gris-linea: #c9cdd6;\n      --gris-fondo: #f4f5f7;\n      --gris-texto: #4a4f57;\n      --negro: #1a1a1a;\n    }\n\n    * { box-sizing: border-box; }\n\n    body {\n      font-family: Arial, Helvetica, sans-serif;\n      font-size: 8pt;\n      margin: 0;\n      padding: 0;\n      padding-bottom: 55px;\n      color: var(--negro);\n      background-color: #ffffff;\n      line-height: 1.35;\n    }\n\n    table { width: 100%; border-collapse: collapse; }\n    td, th { padding: 4px; vertical-align: middle; }\n\n    .mb-8  { margin-bottom: 8px; }\n    .mb-12 { margin-bottom: 12px; }\n    .clear { clear: both; }\n    .bold { font-weight: bold; }\n    .text-right  { text-align: right; }\n    .text-center { text-align: center; }\n    .desc-cell { text-align: left !important; word-break: break-word; overflow-wrap: break-word; white-space: normal; line-height: 1.25; }\n    .number-cell { text-align: right !important; white-space: nowrap; padding-right: 8px !important; }\n\n    /* ---------- Encabezado ---------- */\n    .doc-header {\n      border-bottom: 2.5px solid var(--azul-oscuro);\n      padding-bottom: 10px;\n      margin-bottom: 10px;\n    }\n    .company-name {\n      margin: 0;\n      font-size: 13pt;\n      font-weight: bold;\n      color: var(--azul-oscuro);\n      letter-spacing: 0.2px;\n    }\n    .company-meta {\n      margin: 3px 0 0 0;\n      line-height: 1.45;\n      font-size: 7.5pt;\n      color: var(--gris-texto);\n    }\n    .company-meta strong { color: var(--negro); }\n\n    .doc-title-box {\n      border: 1px solid var(--azul-oscuro);\n      border-radius: 2px;\n      overflow: hidden;\n    }\n    .doc-title-bar {\n      background-color: var(--azul-oscuro);\n      color: #ffffff;\n      font-size: 9.5pt;\n      font-weight: bold;\n      text-align: center;\n      padding: 7px 6px;\n      letter-spacing: 0.4px;\n    }\n    .doc-title-box table td {\n      font-size: 7.5pt;\n      padding: 5px 8px;\n    }\n    .doc-title-box table tr:not(:last-child) td {\n      border-bottom: 1px solid var(--gris-linea);\n    }\n    .doc-title-box .label { color: var(--gris-texto); font-weight: bold; width: 42%; }\n    .doc-title-box .value { text-align: right; font-weight: bold; }\n\n    /* ---------- Bloques de información ---------- */\n    .info-block {\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n    }\n    .info-block td { padding: 6px 10px; }\n    .info-block tr:not(:last-child) td { border-bottom: 1px solid var(--gris-linea); }\n    .info-cell-split { border-right: 1px solid var(--gris-linea); }\n    .info-label {\n      display: block;\n      font-size: 6.5pt;\n      font-weight: bold;\n      color: var(--gris-texto);\n      letter-spacing: 0.3px;\n      margin-bottom: 2px;\n    }\n    .info-value { font-size: 8pt; color: var(--negro); }\n\n    /* ---------- Tabla de productos ---------- */\n    .invoice-table {\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n      overflow: hidden;\n    }\n    .invoice-table thead td {\n      background-color: var(--azul-oscuro);\n      color: #ffffff;\n      font-size: 7pt;\n      font-weight: bold;\n      text-align: center;\n      padding: 7px 4px;\n    }\n    .invoice-table tbody td {\n      font-size: 7.5pt;\n      border-bottom: 1px solid var(--gris-linea);\n      padding: 5px 4px;\n    }\n    .invoice-table tbody tr:nth-child(even) { background-color: var(--gris-fondo); }\n    .invoice-table tbody tr:last-child td { border-bottom: none; }\n\n    /* ---------- Comentarios y totales ---------- */\n    .comments-box {\n      width: 56%;\n      float: left;\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n    }\n    .comments-header {\n      background-color: var(--gris-fondo);\n      font-weight: bold;\n      font-size: 7pt;\n      letter-spacing: 0.3px;\n      color: var(--gris-texto);\n      padding: 6px 10px;\n      border-bottom: 1px solid var(--gris-linea);\n    }\n    .comments-body {\n      min-height: 58px;\n      padding: 8px 10px;\n      font-size: 7.5pt;\n      white-space: pre-wrap;\n    }\n\n    .totals-box {\n      width: 41%;\n      float: right;\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n      overflow: hidden;\n    }\n    .totals-box td { padding: 6px 10px; font-size: 8pt; }\n    .totals-box tr:not(:last-child) td { border-bottom: 1px solid var(--gris-linea); }\n    .totals-box .t-label { color: var(--gris-texto); font-weight: bold; }\n    .totals-box .t-value { text-align: right; }\n    .totals-box tr.total-final td {\n      background-color: var(--azul-oscuro);\n      color: #ffffff;\n      font-size: 9.5pt;\n      font-weight: bold;\n      padding: 9px 10px;\n    }\n\n    /* ---------- Disclaimer ---------- */\n    .disclaimer-section {\n      font-size: 7pt;\n      color: var(--gris-texto);\n      margin-top: 18px;\n      padding-top: 10px;\n      border-top: 1px solid var(--gris-linea);\n      text-align: justify;\n    }\n    .disclaimer-section strong { color: var(--negro); }\n\n    /* ---------- Firmas ---------- */\n    .report-footer {\n      margin-top: 55px;\n      width: 100%;\n    }\n    .signature-box {\n      display: inline-block;\n      width: 46%;\n      text-align: center;\n    }\n    .signature-line {\n      border-top: 1px solid var(--negro);\n      margin: 0 auto;\n      width: 82%;\n      padding-top: 5px;\n      font-weight: bold;\n      font-size: 7.5pt;\n      letter-spacing: 0.3px;\n    }\n\n    /* ---------- Pie de página fijo ---------- */\n    .page-footer {\n      position: fixed;\n      bottom: 0;\n      left: 0;\n      right: 0;\n      text-align: center;\n      font-size: 7pt;\n      color: var(--gris-texto);\n      border-top: 1px solid var(--gris-linea);\n      padding-top: 8px;\n      background-color: #ffffff;\n    }\n    .page-footer .divider { color: var(--gris-linea); margin: 0 6px; }\n  </style>\n</head>\n<body>\n\n  <!-- SECCIÓN 1: ENCABEZADO EMPRESA Y ORDEN -->\n  <table class=\"doc-header\">\n    <tr>\n      <td style=\"width: 22%; padding-right: 10px; vertical-align: top;\">\n        <img src=\"{{ $('HTTP Request').item.json.value[0].Logo }}\" alt=\"Logo de la Empresa\" style=\"max-width: 140px; height: auto;\">\n      </td>\n      <td style=\"width: 43%; vertical-align: top;\">\n        <p class=\"company-name\">{{ $json.RazonSocialEmpresa }}</p>\n        <p class=\"company-meta\">\n          {{ $json.DireccionEmpresa }}<br>\n          Teléfono: {{ $json.TelefonoEmpresa1 }}\n        </p>\n      </td>\n      <td style=\"width: 35%; vertical-align: top;\">\n        <div class=\"doc-title-box\">\n          <div class=\"doc-title-bar\">ORDEN DE COMPRA</div>\n          <table>\n            <tr>\n              <td class=\"label\">NÚMERO</td>\n              <td class=\"value\">{{ $json.DocNum }}</td>\n            </tr>\n            <tr>\n              <td class=\"label\">FECHA</td>\n              <td class=\"value\">{{ $json.FechaDocumento }}</td>\n            </tr>\n            <tr>\n              <td class=\"label\">DESPACHO</td>\n              <td class=\"value\">{{ $json.FechaDespacho }}</td>\n            </tr>\n          </table>\n        </div>\n      </td>\n    </tr>\n  </table>\n\n  <!-- SECCIÓN 2: INFO PROVEEDOR -->\n  <table class=\"info-block mb-12\">\n    <tr>\n      <td class=\"info-cell-split\" style=\"width: 65%;\">\n        <span class=\"info-label\">PROVEEDOR / SUPPLIER</span>\n        <span class=\"info-value\">{{ $json.NombreProveedor }}</span>\n      </td>\n      <td style=\"width: 35%;\">\n        <span class=\"info-label\">NIT / ID NUMBER</span>\n        <span class=\"info-value\">{{ $json.NITProveedor }}</span>\n      </td>\n    </tr>\n    <tr>\n      <td class=\"info-cell-split\">\n        <span class=\"info-label\">CONTACTO / CONTACT</span>\n        <span class=\"info-value\">{{ $json.NombreContacto }}</span>\n      </td>\n      <td>\n        <span class=\"info-label\">TELÉFONO / PHONE</span>\n        <span class=\"info-value\">{{ $json.TelefonoProveedor1 }}</span>\n      </td>\n    </tr>\n    <tr>\n      <td colspan=\"2\">\n        <span class=\"info-label\">DIRECCIÓN / ADDRESS</span>\n        <span class=\"info-value\">{{ $json.DireccionProveedorCompleta }}</span>\n      </td>\n    </tr>\n  </table>\n\n  <!-- SECCIÓN 3: CONDICIONES -->\n  <table class=\"info-block mb-12\">\n    <tr>\n      <td colspan=\"2\">\n        <span class=\"info-label\">CONDICIONES DE PAGO / PAYMENT TERMS</span>\n        <span class=\"info-value\">{{ $json.CondicionPago }}</span>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"width: 35%;\">\n        <span class=\"info-label\">DIVISA / CURRENCY</span>\n        <span class=\"info-value\">{{ $json.Moneda }}</span>\n      </td>\n    </tr>\n  </table>\n\n  <!-- TABLA DE PRODUCTOS -->\n  <table class=\"invoice-table mb-12\">\n    <thead>\n      <tr>\n        <td style=\"width: 12%;\">CÓDIGO</td>\n        <td style=\"width: 33%;\">DESCRIPCIÓN</td>\n        <td style=\"width: 13%;\">UNIDAD</td>\n        <td style=\"width: 10%;\">CANT.</td>\n        <td style=\"width: 15%;\">VLR UNIT</td>\n        <td style=\"width: 17%;\">VLR TOTAL</td>\n      </tr>\n    </thead>\n    <tbody class=\"text-center\">\n      <!-- AQUÍ SE INYECTAN LAS FILAS GENERADAS EN EL NODO CODE -->\n      {{ $json.FilasTabla }}\n    </tbody>\n  </table>\n\n  <!-- SECCIONES FINALES (Comentarios y Totales) -->\n  <div style=\"margin-bottom: 14px; overflow: hidden;\">\n    <table class=\"comments-box\">\n      <tr><td class=\"comments-header\">COMENTARIOS / OBSERVACIONES</td></tr>\n      <tr><td class=\"comments-body\">{{ $json.Comentarios }}</td></tr>\n    </table>\n\n    <table class=\"totals-box\">\n      <tr>\n        <td class=\"t-label\">SUB-TOTAL</td>\n        <td class=\"number-cell t-value\">{{ $json.SubTotal }}</td>\n      </tr>\n      <tr>\n        <td class=\"t-label\">IVA</td>\n        <td class=\"number-cell t-value\">{{ $json.TotalIVA }}</td>\n      </tr>\n      <tr class=\"total-final\">\n        <td>TOTAL</td>\n        <td class=\"number-cell\">{{ $json.TotalDocumento }}</td>\n      </tr>\n    </table>\n    <div class=\"clear\"></div>\n  </div>\n\n  <!-- DISCLAIMER / LEYENDA -->\n  <div class=\"disclaimer-section\">\n    <p><strong>Observaciones:</strong> Todas las órdenes de compra se regirán por lo dispuesto en el Anexo de Términos y Condiciones emitido por {{ $json.RazonSocialEmpresa }}.</p>\n  </div>\n\n  <!-- FIRMAS -->\n  <div class=\"report-footer\">\n    <div class=\"signature-box\">\n      <div class=\"signature-line\">AUTORIZADO POR</div>\n    </div>\n    <div class=\"signature-box\">\n      <div class=\"signature-line\">\n        ELABORADO POR<br>\n        <span style=\"font-weight: normal; font-size: 7pt;\">{{ $json.UsuarioCreador }}</span>\n      </div>\n    </div>\n  </div>\n\n  <!-- PIE DE PÁGINA -->\n  <div class=\"page-footer\">\n    {{ $json.DireccionEmpresa }} <span class=\"divider\">|</span> TELÉFONOS: {{ $json.TelefonoEmpresa1 }} <span class=\"divider\">|</span> {{ $json.EmailEmpresa }}\n  </div>\n\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        2240,
+        -448
+      ],
+      "id": "24d6827a-5098-401d-b045-7267bbbddbe8",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "url": "={{\n  (function() {\n    // 1. Obtenemos el tipo de base de datos del nodo de configuración\n    const dbType = $('Setear Datos').first().json.DataBaseType;\n    \n    // 2. Obtenemos la URL Base (tomada del nodo 'RefresSessionID' según tu imagen)\n    const baseUrl = $('RefresSessionID').item.json.URLSL; \n    \n    // 3. Obtenemos el nombre de la vista y el ID del documento dinámicamente\n    // (Puedes cambiar \"\\(('Split Out').item.json\" por \"\\)json\" si este nodo está directamente conectado)\n    const vistaLayout = $json.VistaLayout; \n    const entry = $json.DocEntry; \n\n    // 4. Construimos la URL\n    if (dbType === 'SQL') {\n      // Endpoint para SQL Server (filtrando por OData)\n      return baseUrl + \"/b1s/v2/view.svc/\" + vistaLayout + \"?$filter=DocEntry eq \" + entry;\n      \n      /* Nota: Si Service Layer te arroja un error de tipado en SQL, \n         ponle comillas simples al entry descomentando la siguiente línea y borrando la anterior:\n         return baseUrl + \"/b1s/v2/view.svc/\" + vistaLayout + \"?$filter=DocEntry eq '\" + entry + \"'\";\n      */\n    } else {\n      // Endpoint para HANA (usando parámetros directos como en tu imagen)\n      return baseUrl + \"/b1s/v2/sml.svc/\" + vistaLayout + \"Parameters(Entry=\" + entry + \")/\" + vistaLayout;\n    }\n  })()\n}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('RefresSessionID').item.json.SESSIONID }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{\n  $response.body['@odata.nextLink'] \n    ? (\n        $('Setear Datos').first().json.DataBaseType === 'SQL'\n          ? $('Setear Datos').first().json.URL_BASE + $response.body['@odata.nextLink']\n          : $('Setear Datos').first().json.URL_BASE + '/b1s/v2/sml.svc/' + $response.body['@odata.nextLink']\n      )\n    : null\n}}",
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body['@odata.nextLink'] }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1568,
+        -448
+      ],
+      "id": "0d2c28b9-83b9-4bd5-887d-3eb97bbd5fa0",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "efaa8c3f-00cb-446c-8b77-2c2c97625b8c",
+              "leftValue": "={{ $json.DocEntry }}",
+              "rightValue": "={{ $(\"Split Out\").all().map(item => item.json.DocEntry).reduce((max, val) => val > max ? val : max) }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        -352
+      ],
+      "id": "0285d3cd-0958-4b23-a146-62b2005e664d",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "value",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -448
+      ],
+      "id": "d5a48012-0f30-4370-9d12-6e157af08d8e",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "url": "={{\n  (function() {\n    // 1. Obtenemos las variables base referenciando el nodo de configuración real\n    const dbType = $('Setear Datos').first().json.DataBaseType;\n    const baseUrl = $('Setear Datos').first().json.URLSL; \n    \n    // 2. Obtenemos el ID del documento directamente del ítem que está pasando por el nodo\n    const entry = $json.DocEntry; // Cambia a $json.Entry si tu campo se llama así\n\n    // 3. Construimos la URL\n    if (dbType === 'SQL') {\n      return baseUrl + \"/b1s/v2/view.svc/SOL_ALERTB1_COREB1SLQuery\";\n    } else {\n      return baseUrl + \"/b1s/v2/sml.svc/SOL_ALERTB1_CORE\";\n    }\n  })()\n}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $json.SESSIONID }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{\n  $response.body['@odata.nextLink'] \n    ? (\n        $('Setear Datos').first().json.DataBaseType === 'SQL'\n          ? $('Setear Datos').first().json.URL_BASE + $response.body['@odata.nextLink']\n          : $('Setear Datos').first().json.URL_BASE + '/b1s/v2/sml.svc/' + $response.body['@odata.nextLink']\n      )\n    : null\n}}",
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body['@odata.nextLink']}}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        -352
+      ],
+      "id": "1f23fcac-d856-4c38-84b9-5d6f67af7c3a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction formatMoney(valor, opciones = {}) {\n  const { conSimbolo = false, simbolo = '$' } = opciones;\n  const num = Number(valor);\n  if (valor === null || valor === undefined || isNaN(num)) {\n    return conSimbolo ? `${simbolo} 0` : '0';\n  }\n  return conSimbolo\n    ? `${simbolo} ${num.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`\n    : num.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 });\n}\n\n// Convierte null/undefined en cadena vacía para evitar el texto \"null\" en el HTML\nfunction limpio(valor) {\n  return (valor === null || valor === undefined) ? '' : valor;\n}\n\nlet filasHTML = \"\";\n\nfor (const item of items) {\n  const art = item.json;\n  filasHTML += `\n    <tr>\n      <td>${art.CodigoArticulo || ''}</td>\n      <td class=\"desc-cell\">${art.DescripcionArticulo || ''}</td>\n      <td>${art.NombreUnidadMedida || ''}</td>\n      <td class=\"number-cell\">${art.Cantidad || 0}</td>\n      <td class=\"number-cell\">${formatMoney(art.PrecioUnitario)}</td>\n      <td class=\"number-cell\">${formatMoney(art.TotalLinea)}</td>\n    </tr>\n  `;\n}\n\nlet cabecera = items[0].json;\ncabecera.FilasTabla = filasHTML;\n\n// Calcular SubTotal si SAP no lo provee directamente (con los valores numéricos crudos, antes de formatear)\nif (!cabecera.SubTotal && cabecera.TotalDocumento && cabecera.TotalIVA) {\n  cabecera.SubTotal = cabecera.TotalDocumento - cabecera.TotalIVA;\n}\n\n// Formatear los campos monetarios de cabecera (se hace DESPUÉS del cálculo de SubTotal)\ncabecera.SubTotal        = formatMoney(cabecera.SubTotal);\ncabecera.TotalIVA        = formatMoney(cabecera.TotalIVA);\ncabecera.TotalDocumento  = formatMoney(cabecera.TotalDocumento);\n\n// Sanear campos que pueden venir null y romper el texto de la dirección o el contacto\ncabecera.NombreContacto   = limpio(cabecera.NombreContacto);\ncabecera.CiudadProveedor  = limpio(cabecera.CiudadProveedor);\ncabecera.ReferenciaProveedor = limpio(cabecera.ReferenciaProveedor);\n\n// Arma la dirección completa evitando guiones o comas huérfanas cuando faltan datos\nconst partesDireccion = [\n  cabecera.DireccionProveedor,\n  cabecera.CiudadProveedor,\n  cabecera.PaisProveedor\n].filter(p => p && p.trim() !== '');\n\ncabecera.DireccionProveedorCompleta = partesDireccion.join(', ');\n\nfunction renderTemplate(template, data) {\n  if (!template) return '';\n  const dataLower = {};\n  for (const key in data) {\n    dataLower[key.toLowerCase()] = data[key];\n  }\n  return template.replace(/%%(\\w+)%%/g, (match, campo) => {\n    const valor = dataLower[campo.toLowerCase()];\n    return (valor !== undefined && valor !== null) ? valor : '';\n  });\n}\n\nreturn [{ json: cabecera }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        -448
+      ],
+      "id": "7a732dc2-40d2-40dc-81b9-263fb105d442",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Comprobante de Egreso {{ $json.DocNum }}</title>\n  <style>\n    @page { size: letter; margin: 1cm; }\n\n    :root {\n      --azul-oscuro: #1b2a4a;\n      --azul-medio: #2c4a75;\n      --gris-linea: #c9cdd6;\n      --gris-fondo: #f4f5f7;\n      --gris-texto: #4a4f57;\n      --negro: #1a1a1a;\n    }\n\n    * { box-sizing: border-box; }\n\n    body {\n      font-family: Arial, Helvetica, sans-serif;\n      font-size: 8pt;\n      margin: 0;\n      padding: 0;\n      padding-bottom: 55px;\n      color: var(--negro);\n      background-color: #ffffff;\n      line-height: 1.35;\n    }\n\n    table { width: 100%; border-collapse: collapse; }\n    td, th { padding: 4px; vertical-align: middle; }\n\n    .mb-8  { margin-bottom: 8px; }\n    .mb-12 { margin-bottom: 12px; }\n    .clear { clear: both; }\n    .bold { font-weight: bold; }\n    .text-right  { text-align: right; }\n    .text-center { text-align: center; }\n    .number-cell { text-align: right !important; white-space: nowrap; padding-right: 8px !important; }\n\n    /* ---------- Encabezado ---------- */\n    .doc-header {\n      border-bottom: 2.5px solid var(--azul-oscuro);\n      padding-bottom: 10px;\n      margin-bottom: 10px;\n    }\n    .company-name {\n      margin: 0;\n      font-size: 13pt;\n      font-weight: bold;\n      color: var(--azul-oscuro);\n      letter-spacing: 0.2px;\n    }\n    .company-meta {\n      margin: 3px 0 0 0;\n      line-height: 1.45;\n      font-size: 7.5pt;\n      color: var(--gris-texto);\n    }\n    .company-meta strong { color: var(--negro); }\n\n    .doc-title-box {\n      border: 1px solid var(--azul-oscuro);\n      border-radius: 2px;\n      overflow: hidden;\n    }\n    .doc-title-bar {\n      background-color: var(--azul-oscuro);\n      color: #ffffff;\n      font-size: 9.5pt;\n      font-weight: bold;\n      text-align: center;\n      padding: 7px 6px;\n      letter-spacing: 0.4px;\n    }\n    .doc-title-box table td {\n      font-size: 7.5pt;\n      padding: 5px 8px;\n    }\n    .doc-title-box table tr:not(:last-child) td {\n      border-bottom: 1px solid var(--gris-linea);\n    }\n    .doc-title-box .label { color: var(--gris-texto); font-weight: bold; width: 42%; }\n    .doc-title-box .value { text-align: right; font-weight: bold; }\n\n    /* ---------- Bloques de información ---------- */\n    .info-block {\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n    }\n    .info-block td { padding: 6px 10px; }\n    .info-block tr:not(:last-child) td { border-bottom: 1px solid var(--gris-linea); }\n    .info-cell-split { border-right: 1px solid var(--gris-linea); }\n    .info-label {\n      display: block;\n      font-size: 6.5pt;\n      font-weight: bold;\n      color: var(--gris-texto);\n      letter-spacing: 0.3px;\n      margin-bottom: 2px;\n    }\n    .info-value { font-size: 8pt; color: var(--negro); }\n\n    /* ---------- Tabla de facturas ---------- */\n    .invoice-table thead td {\n      background-color: var(--azul-oscuro);\n      color: #ffffff;\n      font-size: 7pt;\n      font-weight: bold;\n      text-align: center;\n      padding: 7px 4px;\n    }\n    .invoice-table {\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n      overflow: hidden;\n    }\n    .invoice-table tbody td {\n      font-size: 7.5pt;\n      border-bottom: 1px solid var(--gris-linea);\n      padding: 5px 4px;\n    }\n    .invoice-table tbody tr:nth-child(even) { background-color: var(--gris-fondo); }\n    .invoice-table tbody tr:last-child td { border-bottom: none; }\n\n    /* ---------- Comentarios y totales ---------- */\n    .comments-box {\n      width: 56%;\n      float: left;\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n    }\n    .comments-header {\n      background-color: var(--gris-fondo);\n      font-weight: bold;\n      font-size: 7pt;\n      letter-spacing: 0.3px;\n      color: var(--gris-texto);\n      padding: 6px 10px;\n      border-bottom: 1px solid var(--gris-linea);\n    }\n    .comments-body {\n      min-height: 58px;\n      padding: 8px 10px;\n      font-size: 7.5pt;\n      white-space: pre-wrap;\n    }\n\n    .totals-box {\n      width: 41%;\n      float: right;\n      border: 1px solid var(--gris-linea);\n      border-radius: 2px;\n      overflow: hidden;\n    }\n    .totals-box td { padding: 6px 10px; font-size: 8pt; }\n    .totals-box tr:not(:last-child) td { border-bottom: 1px solid var(--gris-linea); }\n    .totals-box .t-label { color: var(--gris-texto); font-weight: bold; }\n    .totals-box .t-value { text-align: right; }\n    .totals-box tr.total-final td {\n      background-color: var(--azul-oscuro);\n      color: #ffffff;\n      font-size: 9.5pt;\n      font-weight: bold;\n      padding: 9px 10px;\n    }\n\n    /* ---------- Disclaimer ---------- */\n    .disclaimer-section {\n      font-size: 7pt;\n      color: var(--gris-texto);\n      margin-top: 18px;\n      padding-top: 10px;\n      border-top: 1px solid var(--gris-linea);\n      text-align: justify;\n    }\n    .disclaimer-section strong { color: var(--negro); }\n\n    /* ---------- Firmas ---------- */\n    .report-footer {\n      margin-top: 55px;\n      width: 100%;\n    }\n    .signature-box {\n      display: inline-block;\n      width: 46%;\n      text-align: center;\n    }\n    .signature-line {\n      border-top: 1px solid var(--negro);\n      margin: 0 auto;\n      width: 82%;\n      padding-top: 5px;\n      font-weight: bold;\n      font-size: 7.5pt;\n      letter-spacing: 0.3px;\n    }\n\n    /* ---------- Pie de página fijo ---------- */\n    .page-footer {\n      position: fixed;\n      bottom: 0;\n      left: 0;\n      right: 0;\n      text-align: center;\n      font-size: 7pt;\n      color: var(--gris-texto);\n      border-top: 1px solid var(--gris-linea);\n      padding-top: 8px;\n      background-color: #ffffff;\n    }\n    .page-footer .divider { color: var(--gris-linea); margin: 0 6px; }\n  </style>\n</head>\n<body>\n\n  <!-- SECCIÓN 1: ENCABEZADO EMPRESA Y DOCUMENTO -->\n  <table class=\"doc-header\">\n    <tr>\n      <td style=\"width: 22%; padding-right: 10px; vertical-align: top;\">\n        <img src=\"{{ $('HTTP Request').item.json.value[0].Logo }}\" alt=\"Logo de la Empresa\" style=\"max-width: 140px; height: auto;\">\n      </td>\n      <td style=\"width: 43%; vertical-align: top;\">\n        <p class=\"company-name\">{{ $json.NombreSociedad }}</p>\n        <p class=\"company-meta\">\n          <strong>{{ $json.OficinaImpuestos }}</strong><br>\n          {{ $json.DireccionEmpresa }}<br>\n          Teléfono: {{ $json.TelefonoEmpresa1 }}\n        </p>\n      </td>\n      <td style=\"width: 35%; vertical-align: top;\">\n        <div class=\"doc-title-box\">\n          <div class=\"doc-title-bar\">COMPROBANTE DE EGRESO</div>\n          <table>\n            <tr>\n              <td class=\"label\">NÚMERO</td>\n              <td class=\"value\">{{ $json.DocNum }}</td>\n            </tr>\n            <tr>\n              <td class=\"label\">FECHA DE PAGO</td>\n              <td class=\"value\">{{ $json.FechaPago }}</td>\n            </tr>\n          </table>\n        </div>\n      </td>\n    </tr>\n  </table>\n\n  <!-- SECCIÓN 2: INFO PROVEEDOR Y CUENTA -->\n  <table class=\"info-block mb-12\">\n    <tr>\n      <td class=\"info-cell-split\" style=\"width: 65%;\">\n        <span class=\"info-label\">PROVEEDOR / SUPPLIER</span>\n        <span class=\"info-value\">{{ $json.Proveedor }}</span>\n      </td>\n      <td style=\"width: 35%;\">\n        <span class=\"info-label\">NIT / ID NUMBER</span>\n        <span class=\"info-value\">{{ $json.NITProveedor }}</span>\n      </td>\n    </tr>\n    <tr>\n      <td class=\"info-cell-split\">\n        <span class=\"info-label\">BANCO / CUENTA TRANSFERENCIA</span>\n        <span class=\"info-value\">{{ $json.NombreCuentaTransf }} &nbsp;·&nbsp; {{ $json.CuentaTransferencia }}</span>\n      </td>\n      <td>\n        <span class=\"info-label\">DIVISA / CURRENCY</span>\n        <span class=\"info-value\">{{ $json.Moneda }}</span>\n      </td>\n    </tr>\n  </table>\n\n  <!-- TABLA DE FACTURAS PAGADAS -->\n  <table class=\"invoice-table mb-12\">\n    <thead>\n      <tr>\n        <td style=\"width: 18%;\">FACTURA</td>\n        <td style=\"width: 15%;\">VALOR</td>\n        <td style=\"width: 13%;\">DESCUENTO</td>\n        <td style=\"width: 13%;\">RETE IVA</td>\n        <td style=\"width: 13%;\">RETE FUENTE</td>\n        <td style=\"width: 13%;\">RETE ICA</td>\n        <td style=\"width: 15%;\">TOTAL FACTURA</td>\n      </tr>\n    </thead>\n    <tbody class=\"text-center\">\n      <!-- AQUÍ SE INYECTAN LAS FILAS GENERADAS EN EL NODO CODE -->\n      {{ $json.FilasTablaPagos }}\n    </tbody>\n  </table>\n\n  <!-- SECCIONES FINALES (Comentarios y Totales) -->\n  <div style=\"margin-bottom: 14px; overflow: hidden;\">\n    <table class=\"comments-box\">\n      <tr><td class=\"comments-header\">COMENTARIOS / OBSERVACIONES</td></tr>\n      <tr><td class=\"comments-body\">{{ $json.Comentarios }}</td></tr>\n    </table>\n\n    <table class=\"totals-box\">\n      <tr>\n        <td class=\"t-label\">TOTAL ANTES DE DESCUENTO</td>\n        <td class=\"number-cell t-value\">{{ $json.TotalAntesDcto }}</td>\n      </tr>\n      <tr>\n        <td class=\"t-label\">DESCUENTO</td>\n        <td class=\"number-cell t-value\">{{ $json.SumaDescuento }}</td>\n      </tr>\n      <tr class=\"total-final\">\n        <td>TOTAL PAGADO</td>\n        <td class=\"number-cell\">{{ $json.TotalPago }}</td>\n      </tr>\n    </table>\n    <div class=\"clear\"></div>\n  </div>\n\n  <!-- DISCLAIMER / LEYENDA -->\n  <div class=\"disclaimer-section\">\n    <p><strong>Observaciones:</strong> Este comprobante certifica el pago realizado por {{ $json.NombreSociedad }} al proveedor relacionado, correspondiente a las facturas listadas anteriormente.</p>\n  </div>\n\n  <!-- FIRMAS -->\n  <div class=\"report-footer\">\n    <div class=\"signature-box\">\n      <div class=\"signature-line\">AUTORIZADO POR</div>\n    </div>\n    <div class=\"signature-box\">\n      <div class=\"signature-line\">\n        ELABORADO POR<br>\n        <span style=\"font-weight: normal; font-size: 7pt;\">{{ $json.UsuarioCreador }}</span>\n      </div>\n    </div>\n  </div>\n\n  <!-- PIE DE PÁGINA -->\n  <div class=\"page-footer\">\n    {{ $json.NombreSociedad }} <span class=\"divider\">|</span> {{ $json.OficinaImpuestos }}\n  </div>\n\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        2240,
+        -256
+      ],
+      "id": "4c73970e-cc41-4476-9733-5da06ee4d3ec",
+      "name": "HTML1"
+    },
+    {
+      "parameters": {
+        "url": "={{\n  (function() {\n    // 1. Obtenemos el tipo de base de datos del nodo de configuración\n    const dbType = $('Setear Datos').first().json.DataBaseType;\n    \n    // 2. Obtenemos la URL Base (tomada del nodo 'RefresSessionID' según tu imagen)\n    const baseUrl = $('RefresSessionID').item.json.URLSL; \n    \n    // 3. Obtenemos el nombre de la vista y el ID del documento dinámicamente\n    // (Puedes cambiar \"\\(('Split Out').item.json\" por \"\\)json\" si este nodo está directamente conectado)\n    const vistaLayout = $json.VistaLayout; \n    const entry = $json.DocEntry; \n\n    // 4. Construimos la URL\n    if (dbType === 'SQL') {\n      // Endpoint para SQL Server (filtrando por OData)\n      return baseUrl + \"/b1s/v2/view.svc/\" + vistaLayout + \"?$filter=DocEntry eq \" + entry;\n      \n      /* Nota: Si Service Layer te arroja un error de tipado en SQL, \n         ponle comillas simples al entry descomentando la siguiente línea y borrando la anterior:\n         return baseUrl + \"/b1s/v2/view.svc/\" + vistaLayout + \"?$filter=DocEntry eq '\" + entry + \"'\";\n      */\n    } else {\n      // Endpoint para HANA (usando parámetros directos como en tu imagen)\n      return baseUrl + \"/b1s/v2/sml.svc/\" + vistaLayout + \"Parameters(Entry=\" + entry + \")/\" + vistaLayout;\n    }\n  })()\n}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('RefresSessionID').item.json.SESSIONID }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{   $response.body['@odata.nextLink']      ? (         $('Setear Datos').first().json.DataBaseType === 'SQL'           ? $('Setear Datos').first().json.URL_BASE + $response.body['@odata.nextLink']           : $('Setear Datos').first().json.URL_BASE + '/b1s/v2/sml.svc/' + $response.body['@odata.nextLink']       )     : null }}",
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body['@odata.nextLink'] }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1568,
+        -256
+      ],
+      "id": "358cae66-e11f-47de-b86b-5de3246827ab",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "value",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -256
+      ],
+      "id": "5cc60eb0-8d7b-4568-95e0-e16ad8c89b5a",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction formatMoney(valor, opciones = {}) {\n  const { conSimbolo = false, simbolo = '$' } = opciones;\n  const num = Number(valor);\n  if (valor === null || valor === undefined || isNaN(num)) {\n    return conSimbolo ? `${simbolo} 0` : '0';\n  }\n  return conSimbolo\n    ? `${simbolo} ${num.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`\n    : num.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 });\n}\n\nlet filasHTML = \"\";\n\n// Acumuladores para los totales del documento\nlet sumaTotalAntesDcto = 0;\nlet sumaDescuento  = 0;\n\nfor (const item of items) {\n  const det = item.json;\n\n  // Sumar los valores de línea (numéricos, antes de formatear)\n  sumaTotalAntesDcto += Number(det.TotalAntesDcto) || 0;\n  sumaDescuento  += Number(det.SumaDescuento) || 0;\n\n  filasHTML += `\n    <tr>\n      <td>${det.DocNumPagado || ''}</td>\n      <td class=\"number-cell\">${formatMoney(det.ValorAplicado)}</td>\n      <td class=\"number-cell\">${formatMoney(det.SumaDescuento)}</td>\n      <td class=\"number-cell\">${formatMoney(det.ValorRetencionIVA)}</td>\n      <td class=\"number-cell\">${formatMoney(det.ValorRetencionFTE)}</td>\n      <td class=\"number-cell\">${formatMoney(det.ValorRetencionICA)}</td>\n      <td class=\"number-cell\">${formatMoney(det.TotalAntesDcto)}</td>\n    </tr>\n  `;\n}\n\nlet cabecera = items[0].json;\ncabecera.FilasTablaPagos = filasHTML;\n\n// TotalPago NO se suma: es un valor de cabecera repetido en cada línea, se toma tal cual\ncabecera.TotalPago = formatMoney(cabecera.TotalPago);\n\n// Estos SÍ son sumas acumuladas de todas las líneas\ncabecera.TotalAntesDcto     = formatMoney(sumaTotalAntesDcto);\ncabecera.SumaDescuento     = formatMoney(sumaDescuento);\n\ncabecera.ValorTransferencia = formatMoney(cabecera.ValorTransferencia);\n\ncabecera.Comentarios = cabecera.Comentarios ? cabecera.Comentarios : '';\n\nreturn [{ json: cabecera }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        -256
+      ],
+      "id": "2e2e7618-991f-49ca-9e7c-687ff0836f48",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const encoded = Buffer.from($json.output).toString('base64');\n\nreturn { encoded };"
+      },
+      "id": "d8313150-4ed4-49c3-84c9-c9dd15bba93d",
+      "name": "Convert raw to base",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2688,
+        -352
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Obtenemos los valores desde el nodo Filter (que contiene la misma data del Switch)\nconst tipoDoc = $('Filter').item.json.TipoDoc;\nconst docNum = $('Filter').item.json.DocNum;\n\n// Asignamos el nuevo nombre dinámico al archivo adjunto\n$input.item.binary.data.fileName = `${tipoDoc} - ${docNum}.pdf`;\n \nreturn $input.item;"
+      },
+      "id": "f8c01495-9eac-4ce5-8568-ecd4f52b7735",
+      "name": "Cambiar extension1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "encoded",
+        "options": {
+          "fileName": "index.html",
+          "mimeType": "text/html"
+        }
+      },
+      "id": "6ff00c8f-2e62-4ad8-95a2-43b2173091fe",
+      "name": "Convert to HTML1",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2912,
+        -352
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gotenberg-solsetec.tangara.cloud/forms/chromium/convert/html",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "c8f9fb12-4470-4300-a47c-ad0f64c7ad7d",
+      "name": "Generate plain PDF doc1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        3136,
+        -352
+      ],
+      "typeVersion": 4.1,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Qwo8IVOEACriAKiM",
+          "name": "Credential Gotenberg"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "output",
+              "stringValue": "={{ $json.html }}"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      },
+      "id": "af00cd2d-1159-49f5-a61b-062851ba52f4",
+      "name": "Output HTML",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2464,
+        -352
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook-solsetec.tangara.cloud/webhook/CredentialsSL",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "gK5R130CRu7EeTxWxZpLufx1s81AtgcrKCo7rIk4t1S3pc4T02AgJR9JZS0Pfekm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "clientid",
+              "value": "c3c23421-7d1a-47a1-ac57-c3031fd59074"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        -352
+      ],
+      "id": "483f80ae-471e-46b9-bbb6-cbf700025782",
+      "name": "RefresSessionID"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $json.URLSL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "cookie",
+              "value": "=B1SESSION={{ $('RefresSessionID').item.json.SESSIONID }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"U_SOL_Send\": \"N\"\n}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4032,
+        -352
+      ],
+      "id": "007dedc9-3a37-4837-b38d-959a22d4ece2",
+      "name": "HTTP Request1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5583e97c-8b91-4b2f-9b95-88126000c911",
+              "name": "URLSL",
+              "value": "={{ $('RefresSessionID').item.json.URLSL }}/b1s/v2/{{ $('Switch').item.json.TipoDoc === 'Orden de compra' ? 'PurchaseOrders' : 'VendorPayments' }}({{ $('Switch').item.json.DocEntry }})",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3808,
+        -352
+      ],
+      "id": "9dc92d2c-a159-44be-a245-1fbbd2af5c56",
+      "name": "PathServiceLayer"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/3 7-16 * * 1-6"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -352
+      ],
+      "id": "ac6df301-990c-4633-b0bc-5dd6898584c1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## */3 7-17 * * 1-6\n\n*/3: Se ejecuta cada 3 minutos.\n\n7-17: Funciona entre las 7:00 AM y las 5:59 PM (el último disparo será a las 17:57). Nota: Si necesitas que el proceso termine estrictamente a las 5:00 PM sin pasarse al resto de la hora, cambia este valor a 7-16 (el último disparo será a las 16:57).\n\n*: Cualquier día del mes.\n\n*: Cualquier mes del año.\n\n1-6: Días de la semana, de lunes (1) a sábado (6).",
+        "height": 464,
+        "width": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -32,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "c21d081a-8da9-411c-ae92-8406ac7d472d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "fromEmail": "testsolsetec@gmail.com",
+        "toEmail": "={{ $('HTTP Request').item.json.value[0].Correos }}",
+        "subject": "={{ $('Filter').item.json.AsuntoCorreoHTML.replace('%%Proveedor%%',$('Filter').item.json.Proveedor).replace('%%TIPODOC%%', $('Filter').item.json.TipoDoc).replace('%%DocNum%%',$('Filter').item.json.DocNum) }}",
+        "html": "={{ $('Switch').item.json.CuerpoCorreoHTML.replace('%%TipoDoc%%',$('Switch').item.json.TipoDoc).replace('%%NombreProveedor%%',$('Switch').item.json.Proveedor).replace('%%DocNum%%',$('Switch').item.json.DocNum).replace('%%RazonSocialEmpresa%%',$('Switch').item.json.RazonSocial) }}",
+        "options": {
+          "appendAttribution": false,
+          "fileAttachments": "data"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        3584,
+        -352
+      ],
+      "id": "c0954bb1-e9cb-47c7-81c9-1b381c132eda",
+      "name": "Send an Email",
+      "webhookId": "5f87edeb-b825-4888-8cc2-2fa6eefdc9ec",
+      "credentials": {
+        "smtp": {
+          "id": "xFNnLe9FoedSp6ht",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## CUERPO MAIL\n\n<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><style>body{font-family:Arial,Helvetica,sans-serif;color:#333333;font-size:14px;line-height:1.6;margin:0;padding:15px;background-color:#ffffff;}p{margin:0 0 16px 0;}.bold-text{font-weight:600;color:#000000;}</style></head><body><p>Estimado/a <span class=\"bold-text\">%%NombreProveedor%%</span>,</p><p>Nos dirigimos a usted para notificarle la emisión del documento correspondiente a <span class=\"bold-text\">%%TipoDoc%% N° %%DocNum%%</span>.</p><p>Adjunto a este correo encontrará el archivo en formato PDF, el cual contiene toda la información y el detalle asociado a esta transacción.</p><p>Ante cualquier duda o requerimiento adicional, nuestro equipo estará disponible para brindarle la asistencia necesaria.</p><p>Cordialmente,</p><p><span class=\"bold-text\">%%RazonSocialEmpresa%%</span></p></body></html>",
+        "height": 352,
+        "width": 1136,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        -960
+      ],
+      "typeVersion": 1,
+      "id": "52825357-3189-407b-a251-23e0f810ba9d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## ASUNTO MAIL\n\n%%Proveedor%% | Envio de %%TIPODOC%% numero %%DocNum%%",
+        "height": 144,
+        "width": 608,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        -1120
+      ],
+      "typeVersion": 1,
+      "id": "86ea4dd6-0f99-4b78-bdc3-01f5aef33d92",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d50cea5c-cabd-461c-8a00-c860b68ea37d",
+              "name": "SESSIONID",
+              "value": "={{ $json.SESSIONID }}",
+              "type": "string"
+            },
+            {
+              "id": "2fc1a518-a551-4972-acf6-bfb439c1c9cd",
+              "name": "URLSL",
+              "value": "={{ $json.URLSL }}",
+              "type": "string"
+            },
+            {
+              "id": "a4db95c7-28f9-460b-9366-a62b9b1d7dda",
+              "name": "DataBaseType",
+              "value": "={{ $json.DataBase }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -352
+      ],
+      "id": "72947109-eadb-4ae5-baef-e80ec8013824",
+      "name": "Setear Datos"
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-08-30T13:40:03.326-05:00",
+          "Readable date": "August 30th 2026, 1:40:03 pm",
+          "Readable time": "1:40:03 pm",
+          "Day of week": "Sunday",
+          "Year": "2026",
+          "Month": "August",
+          "Day of month": "30",
+          "Hour": "13",
+          "Minute": "40",
+          "Second": "03",
+          "Timezone": "America/Bogota (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Output HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML1": {
+      "main": [
+        [
+          {
+            "node": "Output HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert raw to base": {
+      "main": [
+        [
+          {
+            "node": "Convert to HTML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cambiar extension1": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to HTML1": {
+      "main": [
+        [
+          {
+            "node": "Generate plain PDF doc1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate plain PDF doc1": {
+      "main": [
+        [
+          {
+            "node": "Cambiar extension1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output HTML": {
+      "main": [
+        [
+          {
+            "node": "Convert raw to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RefresSessionID": {
+      "main": [
+        [
+          {
+            "node": "Setear Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PathServiceLayer": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RefresSessionID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "PathServiceLayer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setear Datos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0bdbe4a1-a6ad-43d2-bcee-fd388c87dcf9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec5cc2dd2dc93425bac8ac5a30885c9489657a9f4942de978efcd655a49efe88"
+  },
+  "nodeGroups": [],
+  "id": "a1vqJLenAY6hzQl7",
+  "tags": []
+}

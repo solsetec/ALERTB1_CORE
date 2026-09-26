@@ -1,0 +1,1191 @@
+{
+  "name": "SOLSETEC - Registro de clientes -  Service Layer",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "basicAuth",
+        "formTitle": "Registrar cliente",
+        "responseMode": "lastNode",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -864,
+        -672
+      ],
+      "id": "6c52d7bd-2222-4fc3-a529-2f937d41d636",
+      "name": "On form submission",
+      "webhookId": "ff080c05-6cb5-4ba0-b48a-34090f46c46d",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "3FUkMyCt9YnJmU6I",
+          "name": "Registro de clientesSL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "=={{ $json.camposFormulario }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        -192,
+        -672
+      ],
+      "id": "41f19ccb-5ada-4869-bd7a-67c0352d358e",
+      "name": "Form",
+      "webhookId": "ef2cc4bf-8ef1-4b55-a216-a7ffd77651d9"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "getAll",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": []
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -672
+      ],
+      "id": "16e9230e-67aa-423c-b24b-1775cf9b04c2",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst formValues = items.map(item => {\n  return { \"option\": item.json.TenantName };\n});\n\nconst formFields = [\n  {\n    \"fieldLabel\": \"Seleccione una empresa (Tenant)\",\n    \"fieldType\": \"dropdown\",\n    \"requiredField\": true,\n    \"fieldOptions\": {\n      \"values\": formValues\n    }\n  }\n];\n\nreturn [\n  {\n    json: {\n      camposFormulario: JSON.stringify(formFields)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        -672
+      ],
+      "id": "46d0169c-45be-4d67-8906-e49bf1f451f7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "hiddenField",
+              "fieldName": "=Tenant",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldLabel": "Path Service Layer",
+              "placeholder": "https://PathServiceLayer:50000"
+            },
+            {
+              "fieldLabel": "CompanyDB",
+              "placeholder": "SBOCOMMON"
+            },
+            {
+              "fieldLabel": "UserName",
+              "placeholder": "manager"
+            },
+            {
+              "fieldLabel": "Password",
+              "fieldType": "password",
+              "placeholder": "********"
+            },
+            {
+              "fieldLabel": "DataBase Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "HANA"
+                  },
+                  {
+                    "option": "SQL"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        256,
+        -672
+      ],
+      "id": "dda3394d-c9bf-4f85-bc42-f42ba938dfca",
+      "name": "Form1",
+      "webhookId": "eed7b9ce-a196-4347-adfa-2eba2322eff4"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "get",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "TenantName",
+              "keyValue": "={{ $json['Seleccione una empresa (Tenant)'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -672
+      ],
+      "id": "d8652d6c-be8a-49ea-9726-dfffa72f1303",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "action": "encrypt",
+        "value": "={{ $json.Password }}"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -672
+      ],
+      "id": "5f2d54f6-79b1-4c66-92d5-76e27e523387",
+      "name": "Crypto",
+      "credentials": {
+        "crypto": {
+          "id": "cZsj0kKDGIzHlEV2",
+          "name": "Crypto account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "tableId": "clients",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "TenantId",
+              "fieldValue": "={{ $json.Tenant }}"
+            },
+            {
+              "fieldId": "PathServiceLayer",
+              "fieldValue": "={{ $json['Path Service Layer'] }}"
+            },
+            {
+              "fieldId": "CompanyDB",
+              "fieldValue": "={{ $json.CompanyDB }}"
+            },
+            {
+              "fieldId": "UserName",
+              "fieldValue": "={{ $json.UserName }}"
+            },
+            {
+              "fieldId": "Password",
+              "fieldValue": "={{ $json.data }}"
+            },
+            {
+              "fieldId": "DataBase",
+              "fieldValue": "={{ $json['DataBase Type'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -672
+      ],
+      "id": "aa94b144-554e-4365-a18b-922dff194a49",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "showText",
+        "responseText": "=<div style=\"\n  min-height: 90vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, Segoe UI, Roboto, sans-serif;\n  padding: 40px 20px;\n  text-align: center;\n\">\n  <div style=\"font-size: 48px; margin-bottom: 16px;\">✅</div>\n\n  <h2 style=\"color:#2ecc71; margin: 0 0 12px 0; font-size: 24px;\">\n    Cliente registrado con éxito\n  </h2>\n\n  <p style=\"color:#555; margin: 0 0 32px 0; font-size: 15px; max-width: 400px;\">\n    El cliente ha sido registrado correctamente en el sistema.\n  </p>\n\n  <p style=\"color:#333; margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;\">\n    ID de registro\n  </p>\n\n  <p style=\"\n    font-size: 18px;\n    font-family: monospace;\n    background:#f4f4f4;\n    padding: 14px 28px;\n    border-radius: 8px;\n    display: inline-block;\n    margin: 0 0 24px 0;\n    border: 1px solid #e0e0e0;\n  \">\n    {{ $('Create a row').item.json.id }}\n  </p>\n\n  <p style=\"color:#999; font-size: 13px; margin: 0;\">\n    Guarda este ID para futuras referencias.\n  </p>\n</div>"
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        928,
+        -672
+      ],
+      "id": "7f671ac3-592a-49d6-9e4a-ffc7ab9d1f38",
+      "name": "Form2",
+      "webhookId": "27e2d342-23d3-4b6f-917c-40c7ecae0120"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "CredentialsSL",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -864,
+        -256
+      ],
+      "id": "b1dd2c14-5912-4d58-9b4d-484497721483",
+      "name": "Webhook",
+      "webhookId": "c3bb6cd3-6542-4191-8e7b-fc4ca0299b27",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "NJG9t3BaCNmHHtJX",
+          "name": "CredentialSL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Webhook').item.json.body.clientid }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -448
+      ],
+      "id": "65365960-d41d-4a53-8225-6108fdc10306",
+      "name": "Get a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "action": "decrypt",
+        "value": "={{ $json.Password }}"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -448
+      ],
+      "id": "bfaa8fed-4404-468e-ba91-31a4343168c7",
+      "name": "Crypto1",
+      "credentials": {
+        "crypto": {
+          "id": "cZsj0kKDGIzHlEV2",
+          "name": "Crypto account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"SESSIONID\": \"{{ $('If1').item.json.SessionId }}\",\n  \"URLSL\" : \"{{ $json.PathServiceLayer }}\",\n  \"DataBase\" :\"{{ $json.DataBase }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        480,
+        -64
+      ],
+      "id": "722ea4da-5f1d-44e2-b7b6-99997c7f9d57",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4fe83e0-7294-44ee-8d5b-f5c87541fbda",
+              "name": "CompanyDB",
+              "value": "={{ $json.CompanyDB }}",
+              "type": "string"
+            },
+            {
+              "id": "808d4f68-06e4-4cf2-a6bb-925c4d7ef69b",
+              "name": "UserName",
+              "value": "={{ $json.UserName }}",
+              "type": "string"
+            },
+            {
+              "id": "e4c93755-4b08-4114-bbee-1cf5fc6353cf",
+              "name": "Password",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        -448
+      ],
+      "id": "5a147bae-eb41-4981-944e-2201803fd44d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "get",
+        "tableId": "tokens_service_layer",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "clientid",
+              "keyValue": "={{ $json.body.clientid }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -256
+      ],
+      "id": "f977c8ae-ec97-4834-b2d6-ae9e283ef6d0",
+      "name": "Get a row2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ede90b48-d03b-45c8-9869-121559025a20",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -416,
+        -256
+      ],
+      "id": "f65a7602-e519-4568-bb2c-bf3353f5701e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Crypto1').item.json.PathServiceLayer }}/b1s/v2/Login",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "20238309-a566-4ee4-a01d-95f44a9e6633",
+      "name": "Login local",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        480,
+        -448
+      ]
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "tableId": "tokens_service_layer",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "clientid",
+              "fieldValue": "={{ $('Webhook').item.json.body.clientid }}"
+            },
+            {
+              "fieldId": "SessionId",
+              "fieldValue": "={{ $json.SessionId }}"
+            },
+            {
+              "fieldId": "GenerationDate",
+              "fieldValue": "={{ $now.setLocale() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -448
+      ],
+      "id": "98c652b0-4859-446b-9b66-45afa747b282",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst sessionId = data.session_id;\nconst generationDate = data.GenerationDate;\nconst companyDB = data.company_db;\nconst clientId = data.client_id;\n\n// Crear objetos de fecha\nconst generationDateObj = new Date(generationDate);\n// Calcular expiración (Service Layer expira en 30 min por defecto)\nconst expirationDateObj = new Date(generationDateObj.getTime() + 30 * 60 * 1000);\n\n// Formatear ambas fechas al horario de Bogotá\nconst formattedGenerationDate = generationDateObj.toLocaleString(\"sv-SE\", { timeZone: \"America/Bogota\" }).replace(\" \", \"T\") + \"-05:00\";\nconst formattedExpirationDate = expirationDateObj.toLocaleString(\"sv-SE\", { timeZone: \"America/Bogota\" }).replace(\" \", \"T\") + \"-05:00\";\n\nreturn {\n  json: {\n    clientId,\n    sessionId,\n    companyDB,\n    generationDate: formattedGenerationDate,\n    expirationDate: formattedExpirationDate,\n    isExpired: new Date() > expirationDateObj,\n    remainingMinutes: Math.max(0, Math.floor((expirationDateObj - new Date()) / (60 * 1000)))\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        -160
+      ],
+      "id": "ed7db3ec-17b7-4fec-aed1-5c5528cf6d55",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "04f4d0a8-19c4-493c-8322-f02239acf1e8",
+              "leftValue": "={{ $json.isExpired }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -160
+      ],
+      "id": "45852a56-4058-4418-b165-7b93bd15f9e4",
+      "name": "SessionID ha expirado1"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Webhook').item.json.body.clientid }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        256,
+        -64
+      ],
+      "id": "d50e05e2-6147-4bdb-8b1c-b4ba25c2f4a4",
+      "name": "Get a row3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Webhook').item.json.body.clientid }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        256,
+        -256
+      ],
+      "id": "8c13d6d0-5869-4646-bc3b-fbb64ebface4",
+      "name": "Get a row4",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "action": "decrypt",
+        "value": "={{ $json.Password }}"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -256
+      ],
+      "id": "9a8d573f-04ad-44af-bbe1-fd9f72414fcc",
+      "name": "Crypto2",
+      "credentials": {
+        "crypto": {
+          "id": "cZsj0kKDGIzHlEV2",
+          "name": "Crypto account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4fe83e0-7294-44ee-8d5b-f5c87541fbda",
+              "name": "CompanyDB",
+              "value": "={{ $json.CompanyDB }}",
+              "type": "string"
+            },
+            {
+              "id": "808d4f68-06e4-4cf2-a6bb-925c4d7ef69b",
+              "name": "UserName",
+              "value": "={{ $json.UserName }}",
+              "type": "string"
+            },
+            {
+              "id": "e4c93755-4b08-4114-bbee-1cf5fc6353cf",
+              "name": "Password",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -256
+      ],
+      "id": "b8705d8a-2469-4e62-b50d-1afb0a420c39",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Crypto2').item.json.PathServiceLayer }}/b1s/v2/Login",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "376d605c-5695-4ee9-a40b-cca67c07e0a8",
+      "name": "Login local2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        928,
+        -256
+      ]
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "schema": "solsetec_core",
+        "operation": "update",
+        "tableId": "tokens_service_layer",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "clientid",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.clientid }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "clientid",
+              "fieldValue": "={{ $('Webhook').item.json.body.clientid }}"
+            },
+            {
+              "fieldId": "SessionId",
+              "fieldValue": "={{ $json.SessionId }}"
+            },
+            {
+              "fieldId": "GenerationDate",
+              "fieldValue": "={{ $now.setLocale() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -256
+      ],
+      "id": "1f7d8d01-d7e8-4552-8b89-69a4ddada72a",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HvVwf6y2x2rMXhOL",
+          "name": "SuplierB1_Schema_Sosletec_Core"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"SESSIONID\": \"{{ $('Login local2').item.json.SessionId }}\",\n  \"URLSL\" : \"{{ $('Crypto2').item.json.PathServiceLayer }}\"\n  \"DataBase\" :\"{{ $('Get a row4').item.json.DataBase }}\"\n\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1376,
+        -256
+      ],
+      "id": "88b3c269-bafe-4c4c-bc37-f4239b32feb3",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"SESSIONID\": \"{{ $json.SessionId }}\",\n  \"URLSL\" : \"{{ $('Get a row1').item.json.PathServiceLayer }}\":\n  \"DataBase\" :\"{{ $('Get a row1').item.json.DataBase }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        928,
+        -448
+      ],
+      "id": "b096bba9-3b15-4f84-a7d8-54c59327c957",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook-solsetec.tangara.cloud/webhook/CredentialsSL",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "gK5R130CRu7EeTxWxZpLufx1s81AtgcrKCo7rIk4t1S3pc4T02AgJR9JZS0Pfekm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "clientid",
+              "value": "c3c23421-7d1a-47a1-ac57-c3031fd59074"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -864,
+        160
+      ],
+      "id": "c6947e38-7967-4859-813b-75654975efac",
+      "name": "RefresSessionID"
+    },
+    {
+      "parameters": {
+        "fromEmail": "testsolsetec@gmail.com",
+        "toEmail": "cristian.pinzon@solsetec.com.co;viviana.rojas@solsetec.com.co",
+        "subject": "=Registro de cliente {{ $('Get many rows').item.json.TenantName }}",
+        "html": "=<div style=\"\n  min-height: 90vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, Segoe UI, Roboto, sans-serif;\n  padding: 40px 20px;\n  text-align: center;\n\">\n  <div style=\"font-size: 48px; margin-bottom: 16px;\">✅</div>\n\n  <h2 style=\"color:#2ecc71; margin: 0 0 12px 0; font-size: 24px;\">\n    Cliente registrado con éxito\n  </h2>\n\n  <p style=\"color:#555; margin: 0 0 32px 0; font-size: 15px; max-width: 400px;\">\n    El cliente ha sido registrado correctamente en el sistema.\n  </p>\n\n  <p style=\"color:#333; margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;\">\n    ID de registro\n  </p>\n\n  <p style=\"\n    font-size: 18px;\n    font-family: monospace;\n    background:#f4f4f4;\n    padding: 14px 28px;\n    border-radius: 8px;\n    display: inline-block;\n    margin: 0 0 24px 0;\n    border: 1px solid #e0e0e0;\n  \">\n    {{ $('Create a row').item.json.id }}\n  </p>\n\n  <p style=\"color:#999; font-size: 13px; margin: 0;\">\n    Guarda este ID para futuras referencias.\n  </p>\n</div>",
+        "options": {
+          "appendAttribution": false,
+          "fileAttachments": "data"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -672
+      ],
+      "id": "772e1cd5-56bd-48e5-a093-aca72c883a91",
+      "name": "Send an Email",
+      "webhookId": "5f87edeb-b825-4888-8cc2-2fa6eefdc9ec",
+      "credentials": {
+        "smtp": {
+          "id": "xFNnLe9FoedSp6ht",
+          "name": "SMTP account"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "submittedAt": "2026-08-29T13:35:15.438-05:00",
+          "formMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "webhook-solsetec.tangara.cloud",
+            "user-agent": "n8n",
+            "content-length": "51",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "authorization": "gK5R130CRu7EeTxWxZpLufx1s81AtgcrKCo7rIk4t1S3pc4T02AgJR9JZS0Pfekm",
+            "content-type": "application/json",
+            "x-forwarded-for": "148.230.88.172",
+            "x-forwarded-host": "webhook-solsetec.tangara.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "d8fb65f18bff",
+            "x-real-ip": "148.230.88.172"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "clientid": "07d5236e-558a-41b2-8473-d7de021071c9"
+          },
+          "webhookUrl": "https://webhook-solsetec.tangara.cloud/webhook/CredentialsSL",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Form1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form1": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Form2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form2": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row1": {
+      "main": [
+        [
+          {
+            "node": "Crypto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Login local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get a row1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login local": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "SessionID ha expirado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SessionID ha expirado1": {
+      "main": [
+        [
+          {
+            "node": "Get a row4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a row3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row4": {
+      "main": [
+        [
+          {
+            "node": "Crypto2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Login local2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login local2": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8fa68ab7-25c9-4bb5-bfff-58ea998cfb08",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec5cc2dd2dc93425bac8ac5a30885c9489657a9f4942de978efcd655a49efe88"
+  },
+  "nodeGroups": [],
+  "id": "pRiwywlXl4c2Yk5C",
+  "tags": []
+}
